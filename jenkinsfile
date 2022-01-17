@@ -1,0 +1,34 @@
+pipeline { 
+    agent any
+        stages {
+            stage('Construir') {
+                steps {
+                    echo 'Prueba1'
+            }
+        }
+        stage("JUnit"){
+            steps{
+
+                dir("${env.WORKSPACE}/Backend/build/test-results/test"){
+                    sh 'touch test.xml'
+                    sh 'rm * .xml'
+                }
+
+                cathcError(buildRsult: 'SUCCESS', stageResult: 'FAILURE'){
+                    dir("${env.WORKSPACE}/Backend"){
+                        sh './gradlew test'
+                    }
+                }
+
+                dir("${env.WORKSPACE}/Backend/build/test-results/test"){
+                    junit '*.xml'
+                }
+            }
+        }
+        stage('Desplegar') {
+            steps {
+                echo 'Prueba3'
+            }
+        }
+    }
+}
